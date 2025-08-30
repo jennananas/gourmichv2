@@ -29,6 +29,10 @@ jobs:
           java-version: 17
           distribution: temurin
 
+      # ---------------- Check Repo ----------------
+      - name: Check repo structure
+        run: ls -R $GITHUB_WORKSPACE
+
       # ---------------- Build Angular ----------------
       - name: Build Angular
         run: |
