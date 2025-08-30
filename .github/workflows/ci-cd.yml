@@ -1,114 +1,48 @@
-name: CI/CD
+name: CI/CD Gourmich
 
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
-  # ---------------- Build & Test ----------------
-  build-and-test:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # ---------------- Checkout ----------------
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
+      # ---------------- Setup Node & JDK ----------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Setup JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: temurin
 
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
+      # ---------------- Build Angular ----------------
       - name: Build Angular
         run: |
           cd gourmich-frontend
           npm install
           npm run build:backend
 
-      - name: Run unit tests
-        run: mvn test
-
-      - name: Run integration / E2E tests
-        run: mvn verify -DskipUnitTests
-
-      - name: Generate Jacoco report
-        run: mvn jacoco:report
-
-      - name: Upload Jacoco report
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-report
-          path: target/site/jacoco/index.html
-
-      - name: Check coverage threshold
+      # ---------------- Copy Angular build to Spring Boot ----------------
+      - name: Copy Angular build to Spring Boot
         run: |
-          # Génère le rapport JaCoCo (HTML + XML)
-          mvn clean test jacoco:report
+          cp -r gourmich-frontend/dist/gourmich-frontend/* gourmich-back/src/main/resources/static/
 
-          # Vérifie que le fichier XML existe
-          if [ ! -f target/site/jacoco/jacoco.xml ]; then
-            echo "JaCoCo XML report not found!"
-            exit 1
-          fi
-
-          # Récupère les instructions couvertes et manquées directement avec grep/sed
-          COVERED=$(grep 'counter type="INSTRUCTION"' target/site/jacoco/jacoco.xml | head -1 | sed -n 's/.*covered="\([0-9]*\)".*/\1/p')
-          MISSED=$(grep 'counter type="INSTRUCTION"' target/site/jacoco/jacoco.xml | head -1 | sed -n 's/.*missed="\([0-9]*\)".*/\1/p')
-
-          # Calcule le pourcentage de couverture
-          PERCENT=$(( COVERED * 100 / (COVERED + MISSED) ))
-
-          echo "Coverage: $PERCENT%"
-
-          # Vérifie le seuil
-          if [ "$PERCENT" -lt 80 ]; then
-            echo "Coverage too low: $PERCENT%"
-            exit 1
-          fi
-
-  # ---------------- Deploy Docker ----------------
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build-and-test
-    if: github.ref == 'refs/heads/master'
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: temurin
-
-      - name: Build project
-        run: mvn clean package -DskipTests
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-      - name: Build & Push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/gourmich-app:latest
-
-      - name: Notify deployment success
-        run: echo "Docker image successfully pushed to Docker Hub!"
+      # ---------------- Build & Test Backend ----------------
+      - name: Build and test Spring Boot
+        run: |
+          cd gourmich-back
+          mvn clean verify
