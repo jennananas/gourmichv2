@@ -8,10 +8,10 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "build:prod": "rm -rf dist && ng build --configuration production --output-hashing=all",
-    "reorganize:files": "cd ../gourmich-back/src/main/resources/static && mv browser/* . && rm -rf browser",
-    "copy:backend": "mkdir -p ../gourmich-back/src/main/resources/static && rm -rf ../gourmich-back/src/main/resources/static/* && cp -r dist/gourmich-frontend/* ../gourmich-back/src/main/resources/static/",
-    "build:backend": "npm run build:prod && npm run copy:backend && npm run reorganize:files"
-  },
+  "reorganize:files": "cd ../gourmich-back/src/main/resources/static && mv browser/* . && rm -rf browser",
+  "copy:backend": "mkdir -p ../gourmich-back/src/main/resources/static && rm -rf ../gourmich-back/src/main/resources/static/* && cp -r dist/gourmich-frontend/* ../gourmich-back/src/main/resources/static/",
+  "build:backend": "npm run build:prod && npm run copy:backend && npm run reorganize:files"
+},
   "private": true,
   "dependencies": {
     "@angular/animations": "^19.2.8",
