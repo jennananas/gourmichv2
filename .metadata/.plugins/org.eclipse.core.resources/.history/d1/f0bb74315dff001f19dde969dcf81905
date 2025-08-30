@@ -1,0 +1,13 @@
+package com.gourmichV2;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class GourmichV2BackApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(GourmichV2BackApplication.class, args);
+	}
+
+}
