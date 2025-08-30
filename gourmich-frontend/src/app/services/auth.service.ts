@@ -9,12 +9,12 @@ import { environment } from '../../environments/environment.prod';
 })
 export class AuthService {
   
-  private baseApiUrl = environment.apiUrl + 'auth/';
+  private baseApiUrl = `${environment.apiUrl}auth`;
 
   constructor(private http : HttpClient, private router: Router) { }
 
   login(username: string, password: string) : Observable<any> {
-    return this.http.post(`${this.baseApiUrl}login`, { username, password });
+    return this.http.post(`${this.baseApiUrl}/login`, { username, password });
   }
 
   logout(): void {
@@ -26,7 +26,7 @@ export class AuthService {
     return !!localStorage.getItem('token') }
   
   register(user: {username: string; email: string; password: string}): Observable<any> {
-    return this.http.post(`${this.baseApiUrl}register`, user);
+    return this.http.post(`${this.baseApiUrl}/register`, user);
   }
 
   saveToken(token: string) : void{
@@ -46,13 +46,13 @@ export class AuthService {
   }
 
   checkEmail(email: string): Observable<boolean> {
-    return this.http.get<{ exists: boolean }>(`${this.baseApiUrl}check-email?email=${email}`)
+    return this.http.get<{ exists: boolean }>(`${this.baseApiUrl}/check-email?email=${email}`)
       .pipe(map(response => response.exists));
   }
 
   
   checkUsername(username: string): Observable<boolean> {
-    return this.http.get<{ exists: boolean }>(`${this.baseApiUrl}check-username?username=${username}`)
+    return this.http.get<{ exists: boolean }>(`${this.baseApiUrl}/check-username?username=${username}`)
       .pipe(map(response => response.exists));
   }
 }
