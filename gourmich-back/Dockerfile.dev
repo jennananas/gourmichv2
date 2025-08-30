@@ -1,0 +1,30 @@
+# Étape 1 : build avec Maven + JDK 17
+FROM maven:3.9.6-eclipse-temurin-17 AS build
+
+WORKDIR /app
+
+# Copier pom.xml pour télécharger les dépendances
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+# Copier le code source
+COPY src ./src
+
+# Installer les dépendances et build pour dev
+RUN mvn package -DskipTests
+
+# Étape 2 : image finale dev avec JDK complet pour DevTools
+FROM eclipse-temurin:17-jdk
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+
+# Expose le port Spring Boot
+EXPOSE 8080
+
+# Active DevTools restart automatique
+ENV SPRING_DEVTOOLS_RESTART_ENABLED=true
+
+# Commande pour dev
+CMD ["java", "-jar", "app.jar"]
