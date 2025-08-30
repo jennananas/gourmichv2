@@ -1,0 +1,141 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<body class="bg-gradient-to-r lg:bg-gradient-to-b from-white to-orange-100 via-orange-50 
+    flex flex-col justify-start gap-4 pt-4 p-4 md:p-6 lg:px-8">
+    <header>
+    <p-button
+    label="Back to recipes"
+    icon="pi pi-arrow-left"
+    styleClass="!justify-start !text-sm md:!text-lg w-[200px] p-2 !text-black !bg-transparent hover:!bg-orange-300/20 !border-none"
+    routerLink="/recipes"
+    ></p-button>
+    </header>
+    <!-- Recipe Image -->
+    <div class="flex flex-col gap-4 lg:flex-row lg:gap-12">
+    <section *ngIf="recipe" class="w-full flex-1">
+    <div class="relative w-full">
+    <ng-container *ngIf="!imageLoadError[recipe.id]; else fallback">
+      <img
+        [src]="recipe.imageUrl"
+        (error)="imageLoadError[recipe.id] = true"
+        class="w-full h-40 md:h-100 object-cover rounded-md shadow-lg"
+      />
+    </ng-container>
+
+    <ng-template #fallback>
+      <div
+        class="w-full h-40 md:h-100 rounded-md bg-gradient-to-br from-yellow-300 via-orange-300 to-orange-500 
+               flex items-center justify-center text-white font-semibold text-sm shadow-lg">
+        Image failed to load
+      </div>
+    </ng-template>
+  </div>
+    </section>
+    <!-- Recipe Details -->
+    <section class="flex flex-col gap-4 lg:flex-1">
+    <div *ngIf="recipe as r" class="flex gap-2 text-sm md:text-md justify-between items-center">
+        <div class="flex gap-2 items-center">
+             <p-chip [label]="r.category" styleClass="!bg-white !border-orange-900/20 !border-[1px] !rounded-md"></p-chip>
+        <p-chip *ngIf="r.difficulty !== undefined" 
+                [label]="r.difficulty | difficultyLabel"
+                styleClass="!bg-white !border-orange-900/20 !border-[1px] !rounded-md">
+        </p-chip>
+        </div>
+       
+    <div class="flex gap-2 items-center" *ngIf="recipe?.authorUsername && currentUser && recipe.authorUsername === currentUser">
+  <p-button 
+    styleClass="!text-orange-500 !text-md !bg-white"
+    icon="pi pi-pencil"
+   pTooltip="Edit Recipe"
+    pTooltipPosition="left"
+    routerLink="/edit-recipe/{{recipe.id}}"
+  ></p-button>
+
+  <p-button 
+    styleClass="!text-orange-500 !text-md !bg-white"
+    icon="pi pi-trash"
+    pTooltip="Delete Recipe"
+    pTooltipPosition="left"
+    (click)="confirmDelete(recipe, $event)"
+  ></p-button>
+</div>
+    </div>
+    
+    <h2 class="text-3xl font-bold">{{recipe.title}}</h2>
+    <p class="text-orange-900/50 md:text-lg">{{recipe.description }}</p>
+    <div class="flex items-center gap-4 mt-4">
+        <p-avatar shape="circle" [label]="recipe.authorUsername | firstLetter" size="large" />
+        <span class="flex flex-col">
+            <p class="font-bold">{{recipe.authorUsername}}</p>
+            <p class="text-orange-900/50">Recipe creator</p>
+        </span>
+        
+    </div>
+    <div class="grid grid-cols-2 gap-4
+    lg:grid-cols-4 mt-6">
+        <!-- Total Time -->
+        <p-chip class="flex flex-col items-center text-center !p-4 !bg-white !gap-0">
+            <i class="pi pi-clock text-orange-500 !text-2xl"></i>
+            <span class="text-sm text-orange-900/50">Total Time</span>
+            <span class="font-bold">{{ recipe.cookingTime }} min</span>
+        </p-chip>
+
+        <!--  //** Servin **//
+        <p-chip class="flex flex-col items-center text-center !p-4 !bg-white !gap-0">
+            <i class="pi pi-users text-orange-500 !text-2xl"></i>
+            <span class="text-sm text-orange-900/50">Servings</span>
+            <span class="font-bold">xxx</span>
+        </p-chip>
+
+         //** Ratings **//
+        <p-chip class="flex flex-col items-center text-center !p-4 !bg-white !gap-0">
+            <i class="pi pi-star text-yellow-500 !text-2xl"></i>
+            <span class="text-sm text-orange-900/50">Rating</span>
+            <span class="font-bold">xxx / 5</span>
+        </p-chip>
+
+        //** Likes **//
+        <p-chip class="flex flex-col items-center text-center !p-4 !bg-white !gap-0">
+            <i class="pi pi-heart text-red-500 !text-2xl"></i>
+            <span class="text-sm text-orange-900/50">Likes</span>
+            <span class="font-bold">xxx</span>
+        </p-chip> -->
+    </div>
+    
+    <div class="flex mb-6 gap-2">
+        <p-button 
+          [label]="isFavorite ? '' : 'Like Recipe'"
+          [icon]="isFavorite ? 'pi pi-heart-fill text-red-500' : 'pi pi-heart text-red-500'"
+          iconPos="left"
+          styleClass="!bg-white !border-orange-900/20 !border-[1px] !rounded-md !text-black !text-xs md:!text-md"
+          (click)="toggleFavorite(recipe)"
+/>
+
+    <!--    <p-button label="Save to Collection" icon="pi pi-book" styleClass="!bg-white !border-orange-900/20 !border-[1px] !rounded-md !text-black !text-xs md:!text-md"/> -->
+    </div>
+</section>
+</div>
+</body>
+<section class="bg-white flex flex-col gap-4 p-4 rounded-md shadow-lg">
+  <p-tabs value="0">
+    <p-tablist class="bg-orange-100">
+      <p-tab value="0" class="text-center">Ingredients ({{ getIngredientsCount() }})</p-tab>
+      <p-tab value="1" class="text-center">Instructions</p-tab>
+    </p-tablist>
+
+    <p-tabpanels >
+      <p-tabpanel value="0">
+        <ul class="list-disc pl-6">
+          <li *ngFor="let ingredient of recipe?.ingredients">
+            {{ ingredient.name }} - {{ ingredient.quantity }} {{ ingredient.unit }}
+          </li>
+        </ul>
+      </p-tabpanel>
+      <p-tabpanel value="1">
+        <p>{{ recipe.instructions }}</p>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</section>
+

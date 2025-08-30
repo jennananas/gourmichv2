@@ -1,0 +1,92 @@
+<div class="relative z-10 h-screen w-full items-center justify-center mt-10">
+    <div class="w-full max-w-md m-auto bg-white rounded p-8 pb-12">   
+        <header class="flex items-center gap-2 mb-8">
+            <img class="w-24" src="./assets/images/chef.png" />
+            <h2 class="text-2xl">Create your account</h2>
+        </header>   
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="mb-4">
+            <!-- Email Field -->
+             <div class="mb-4">
+                <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="text-red-500">
+                    <small *ngIf="email?.errors?.['required']">⚠️ Email is required</small>
+                    <small *ngIf="email?.errors?.['email'] || email?.errors?.['pattern']">⚠️ Email not valid</small>
+                    <small *ngIf="email?.errors?.['emailTaken']">⚠️ This email is already used</small>
+                </div>
+                <p-floatlabel class="w-full" variant="on" >
+                    <input pInputText id="email" formControlName="email" required
+                    class="w-full" type="email" name="email">
+                    <label for="email">Email</label>
+                </p-floatlabel>
+            </div>
+            <!-- Username Field -->
+            <div class="mb-4">
+                <div *ngIf="username?.invalid && (username?.dirty || username?.touched)" class="text-red-500">
+                    <small *ngIf="username?.errors?.['required']">⚠️ Username is required</small>
+                    <small *ngIf="username?.errors?.['minlength'] || username?.errors?.['maxlength'] ">⚠️ Username must be between 4 and 20 characters long.</small>
+                    <small *ngIf="username?.errors?.['pattern']">⚠️ Use only letters, digit or underscore (_)</small>
+                    <small *ngIf="username?.errors?.['usernameTaken']">⚠️ This username is already taken</small>
+                </div>
+                <p-floatlabel variant="on">
+                    <input pInputText id="username" formControlName="username" required
+                        class="w-full" type="text" name="username">
+                    <label for="username">Username</label>
+                </p-floatlabel>
+                
+            </div>
+            <!-- Password Field -->
+            <div class="mb-4">
+                <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="text-red-500">
+                    <small *ngIf="password?.errors?.['required']">⚠️ Password is required.</small>
+                    <small *ngIf="password?.errors?.['minlength']">⚠️ Password must be at least 8 characters long</small>
+                    <small *ngIf="password?.errors?.['pattern']">⚠️ Password must contains at least a lowercase, an uppercase, a digit and a special character.</small>
+                </div>
+                <p-floatlabel variant="on">
+                    <p-password formControlName="password" type="password" class="w-full" [feedback]="true"
+            styleClass="p-password p-component p-inputwrapper p-input-icon-right" [style]="{'width':'100%'}"
+            [inputStyle]="{'width':'100%'}" [toggleMask]="true"/>
+                        <label for="password">Password</label>
+                </p-floatlabel>
+                
+            </div>
+
+            <!-- Confirm Password Field -->
+            <div class="mb-4">
+                <div *ngIf="confirmPassword?.invalid && (confirmPassword?.dirty || confirmPassword?.touched)" class="text-red-500">
+                    <small *ngIf="confirmPassword?.errors?.['required']">⚠️ Password confirmation is required</small>
+                    <small *ngIf="confirmPassword?.errors?.['passwordMismatch']">⚠️ Passwords don't match</small>
+                </div>
+                <p-floatlabel variant="on">
+                    <p-password formControlName="confirmPassword" type="password" class="w-full" [feedback]="false"
+                    styleClass="p-password p-component p-inputwrapper p-input-icon-right" [style]="{'width':'100%'}"
+                    [inputStyle]="{'width':'100%'}" [toggleMask]="true"/>
+                <label for="confirmPassword">Confirm Password</label>   
+            </p-floatlabel>
+                
+            </div>
+
+            <!-- Submit Button -->
+            <div>          
+                <p-button 
+                label="Submit"
+                type="submit" 
+                styleClass="w-full"
+                [disabled]="registerForm.invalid"/>
+            </div>       
+        </form>  
+        <footer class="flex justify-between">
+            <p-button 
+            label="Forgot Password?"
+            icon="pi pi-exclamation-triangle"
+            styleClass="text-gray-600!"
+            [link]="true"
+            routerLink="/forgot-password"/>
+            <p-button 
+            label="Login"
+            icon="pi pi-arrow-left"
+            [link]="true"
+            styleClass="text-gray-600!"
+            routerLink="/login"/>
+            
+        </footer>   
+    </div>
+</div>

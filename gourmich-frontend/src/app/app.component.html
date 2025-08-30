@@ -1,0 +1,16 @@
+<p-toast></p-toast>
+<p-confirmDialog [style]="{width: '400px'}" [position]="'center'"></p-confirmDialog>
+
+<div class="inset-0 "> 
+    <body class="relative">
+        <div class="absolute inset-0 bg-[url('/assets/images/gridBg.png')] bg-cover bg-center opacity-10 -z-10"></div>
+
+        <header class="relative z-10">
+            <app-header/>
+            <router-outlet/>
+        </header>
+        <footer class="relative z-10">
+            <app-footer/>   
+        </footer>
+    </body>
+

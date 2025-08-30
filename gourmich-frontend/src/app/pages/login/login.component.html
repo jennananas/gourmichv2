@@ -1,0 +1,56 @@
+<div class="relative z-10 h-screen w-full mt-[150px]">
+    <div class="w-full max-w-md m-auto bg-white rounded p-8 pb-12">   
+        <header>
+            <img class="w-24 mx-auto mb-8" src="./assets/images/chef.png" />
+        </header>   
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mb-4">
+          <p *ngIf="errorMessage" class="text-red-500 mb-4 text-center">
+            {{ errorMessage }}
+          </p>
+          
+            <div class="mb-4">
+              <div *ngIf="loginForm.get('username')?.hasError('required') && loginForm.get('username')?.touched">
+                <small style="color:red; margin-bottom: 8px;">Username is required</small>
+              </div>
+              <p-floatlabel class="w-full mb-8" variant="on" >
+                <input class="w-full" id="username" pInputText formControlName="username" name="username" required/>
+                <label for="username">Username</label>
+              </p-floatlabel>
+            </div>
+            
+            <div class="mb-4">
+              <div *ngIf="loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched">
+                <small style="color:red;margin-bottom: 8px;">Password is required</small>
+              </div>
+              <p-floatlabel class="w-full mb-8" variant="on">
+                <p-password formControlName="password" type="password" class="w-full" [feedback]="false"
+            styleClass="p-password p-component p-inputwrapper p-input-icon-right" [style]="{'width':'100%'}"
+            [inputStyle]="{'width':'100%'}" [toggleMask]="true"/>
+                <label for="password">Password</label>
+              </p-floatlabel>
+            </div>
+            
+            <div class="mb-4">          
+              <p-button 
+              label="Login"
+              styleClass="w-full"
+              type="submit"/>
+            </div>       
+        </form>  
+
+        <footer class="flex justify-between">
+            <p-button 
+            label="Forgot Password?"
+            icon="pi pi-exclamation-triangle"
+            [link]="true"
+            routerLink="/forgot-password"
+            styleClass="text-gray-600!"/>
+            <p-button
+            label="Create an account"
+            icon="pi pi-user-plus"
+            [link]="true"
+            routerLink="/register"
+            styleClass="text-gray-600!"/>
+        </footer>   
+    </div>
+</div>

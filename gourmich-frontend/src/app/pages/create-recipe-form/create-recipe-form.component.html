@@ -1,0 +1,229 @@
+<div class="relative z-10 h-screen w-full mt-8">
+    <div class="w-full max-w-lg m-auto bg-white rounded p-8 pb-12">   
+        <!-- <header>
+            <img class="w-24 mx-auto mb-8" src="./assets/images/chef.png" />
+        </header>    -->
+        <form *ngIf="recipeForm" [formGroup]="recipeForm" (ngSubmit)="onSubmit()" class="space-y-6">
+            <p-stepper [(value)]="activeStep" class="basis-[50rem]">
+                <p-step-list>
+                    <p-step [value]="1" [disabled]="activeStep !== 1" [hidden]="activeStep !==1">About my recipe</p-step> 
+                    <p-step [value]="2" [disabled]="activeStep !== 2" [hidden]="activeStep > 2">Ingredients</p-step>
+                    <p-step [value]="3" [disabled]="activeStep !== 3" >Instructions</p-step>
+                </p-step-list>
+                <p-step-panels>
+                    <p-step-panel [value]="1">
+                        <!-- STEP 1 -->
+                        <ng-template #content let-activateCallback="activateCallback" let-value="value">
+                        <div class="flex flex-col gap-4" [formGroup]="step1">
+                          <!-- Title -->
+                          <div>
+                          <div *ngIf="step1.get('title')?.touched && step1.get('title')?.invalid" class="text-red-500 text-sm mb-2">
+                            <small *ngIf="step1.get('title')?.errors?.['required']">Title is required.</small>
+                            <small *ngIf="step1.get('title')?.errors?.['minlength'] || step1.get('title')?.errors?.['maxlength']">Title must be between 4 and 30 characters long.</small>
+                          </div>
+                          <p-floatlabel class="w-full" variant="on">
+                              <input pInputText id="title" formControlName="title" class="w-full"/>
+                              <label for="title">Title*</label>
+                          </p-floatlabel>
+                        </div>
+                            <!-- Description -->
+                            <div *ngIf="step1.get('description')?.touched && step1.get('description')?.invalid" class="text-red-500 text-sm">
+                              <small *ngIf="step1.get('description')?.errors?.['pattern']">
+                                Description contains invalid characters.
+                              </small>
+                            </div>
+                            <textarea rows="4" pTextarea formControlName="description" class="w-full" placeholder="Describe your recipe..."></textarea>   
+                            <!-- Image -->
+                            <div *ngIf="step1.get('imageUrl')?.touched && step1.get('imageUrl')?.invalid" class="text-red-500 text-sm">
+                              <small *ngIf="step1.get('imageUrl')?.errors?.['required']">
+                                Image URL is required.
+                              </small>
+                              <small *ngIf="step1.get('imageUrl')?.errors?.['pattern']">
+                                Please enter a valid image URL (must start with http/https and end with .jpg, .png, etc).
+                              </small>
+                            </div>
+                            <p-floatlabel class="w-full p-float-label-active!" variant="on">
+                                <input pInputText id="image" formControlName="imageUrl" class="w-full" required />
+                                <label for="image">Image url. ex: https://exemple.com/image.jpg*</label>
+                            </p-floatlabel>
+                            <!-- Category -->
+                            <div *ngIf="step1.get('category')?.touched && step1.get('category')?.invalid" class="text-red-500 text-sm mt-1">
+                              <small *ngIf="step1.get('category')?.errors?.['required']">
+                                Category is required.
+                              </small>
+                            </div>
+                            <p-select 
+                                formControlName="category"
+                                [options]="categories"
+                                placeholder="Select a category*"
+                                class="w-full">
+                            </p-select>
+                            <!-- Difficulty -->
+                            <small *ngIf="step1.get('difficulty')?.touched && step1.get('difficulty')?.invalid" class="text-red-500 text-sm mt-1">
+                              Evaluate the difficulty of your recipe.
+                            </small>
+                            <div class="w-full">
+                                <p-fieldset legend="Difficulty*" class="w-full">
+                                    <p-rating formControlName="difficulty" [stars]="5" ></p-rating>
+                                </p-fieldset>
+                            </div>
+                            <!-- Time -->
+                            <div *ngIf="step1.get('cookingTime')?.touched && step1.get('cookingTime')?.invalid" class="text-sm text-red-500 mt-1">
+                              <small *ngIf="step1.get('cookingTime')?.errors?.['required']">
+                                Cooking time is required.
+                              </small>
+                              <small *ngIf="step1.get('cookingTime')?.errors?.['min']">
+                                Cooking time must be at least 1 minute.
+                              </small>
+                            </div>
+                            <p-floatlabel class="w-full" variant="on">
+                                <p-inputnumber [min]="1" pKeyFilter="num" id="cookingTime" formControlName="cookingTime" class="w-full" />
+                                <label for="cookingTime">Cooking Time (in minutes)*</label>
+                            </p-floatlabel>
+                        </div>
+                        <div class="flex pt-6 justify-end">
+                            <p-button (click)="onNextStep(step1, 2, activateCallback)" [disabled]="step1.invalid" label="Next" icon="pi pi-arrow-right" iconPos="right" />
+                        </div>
+                        </ng-template>
+                    </p-step-panel>
+                    <p-step-panel [value]="2">
+                        <!-- STEP 2 -->
+                        <ng-template #content let-activateCallback="activateCallback" let-value="value">
+                            <div [formGroup]="step2">
+                                <!-- Section Ingrédients -->
+                                <div class="mb-8 w-full">
+                                    <!-- Formulaire d'ajout d'un nouvel ingrédient -->
+                                    <div class="w-full">
+                                      <small class="text-red-500" *ngIf="ingredients.invalid">
+                                        <span *ngIf="ingredients.errors?.['required']">At least one ingredient is required.</span>
+                                      </small>
+                                      <small class="text-red-500" *ngIf="ingredientInput.touched && ingredientInput.invalid">
+                                        <span *ngIf="ingredientInput.errors?.['required']">Ingredient name is required.</span>
+                                        <span *ngIf="ingredientInput.errors?.['minlength']">Ingredient name must be at least 3 characters long.</span>
+                                      </small>
+                                      <small *ngIf="quantityInput.touched && quantityInput.invalid" class="text-red-500 text-sm">
+                                        Quantity is required.
+                                      </small>
+                                      <small *ngIf="unitInput.touched && unitInput.invalid" class="text-red-500 text-sm">
+                                        Unit is required.
+                                      </small>
+                                    </div>
+                                    <div  class="mt-4 w-full space-y-4">
+                                      <div class="flex items-center gap-2">
+                                        <!-- Champ Nom (AutoComplete) -->
+                                        <div class="w-full">
+                                          
+                                          <p-autoComplete
+                                            [formControl]="ingredientInput"
+                                            [suggestions]="filteredIngredients"
+                                            (completeMethod)="searchIngredients($event)"
+                                            placeholder="Add an ingredient"
+                                            [forceSelection]="false"
+                                            inputStyleClass="w-full"
+                                            [minlength]="3"
+                                            required>  
+                                          </p-autoComplete>
+                                        </div>
+                                        <!-- Champ Quantité -->
+                                        <div>
+                                          <p-inputNumber 
+                                            [formControl]="quantityInput" 
+                                            inputClass="w-8" 
+                                            [min]="1" 
+                                            [showButtons]="true"
+                                            buttonLayout="horizontal"
+                                            required>
+                                            <ng-template #incrementbuttonicon>
+                                                <span class="pi pi-plus"></span>
+                                            </ng-template>
+                                            <ng-template #decrementbuttonicon>
+                                                <span class="pi pi-minus"></span>
+                                            </ng-template>
+                                          </p-inputNumber>
+                                        </div>
+                                  
+                                        <!-- Champ Unité -->
+                                        
+                                        <div class="w-max-content">
+                                          <p-select 
+                                            [formControl]="unitInput" 
+                                            [options]="units" 
+                                            optionLabel="label" 
+                                            optionValue="value"
+                                            placeholder="Unit" 
+                                            class="w-full"
+                                            required>
+                                          </p-select>
+                                          
+                                        </div>
+                                        <div>
+                                            <button 
+                                              pButton 
+                                              type="button" 
+                                              icon="pi pi-plus" 
+                                              (click)="addIngredient()"
+                                              >
+                                            </button>
+                                        </div>
+                                      </div>
+                                    </div>  
+                                    <!-- Fin formulaire ingrédient -->
+                                    <!-- Liste des ingrédients ajoutés -->
+                                    <div class="mt-4">
+                                      <ul class="flex flex-wrap gap-4 text-blue-600">
+                                        <p-button  (click)="editIngredient(i)" variant="outlined"  severity="secondary"
+                                        *ngFor="let ingredient of ingredients.controls; let i = index"
+                                        >
+                                            {{ ingredient.value.name }} :  {{ ingredient.value.quantity }}{{ ingredient.value.unit ? ' ' + ingredient.value.unit : '' }}
+                                            <button 
+                                              pButton 
+                                              type="button" 
+                                              icon="pi pi-times" 
+                                              class="p-button-danger ml-2" 
+                                              size="small"
+                                              (click)="removeIngredient(i)">
+                                            </button>
+                                        </p-button>
+                                      </ul>
+                                  </div>
+                                        </div>    
+                                    </div>
+                                    <div class="flex pt-6 justify-between">
+                                        <p-button (click)="activateCallback(1)" label="Back" severity="secondary" icon="pi pi-arrow-left" />
+                                       <p-button 
+                                          (click)="onNextStep(step2, 3, activateCallback)" 
+                                          [disabled]="step2.invalid" 
+                                          label="Next" icon="pi pi-arrow-right" iconPos="right" 
+                                        />
+                                    </div>
+                        </ng-template>
+                    </p-step-panel>
+                    <!-- STEP 3 -->
+                    <p-step-panel [value]="3">
+                        <ng-template #content let-activateCallback="activateCallback" let-value="value">
+                            <div class="flex flex-col gap-4"  [formGroup]="step3">
+                                <!-- Instructions -->
+                                <small *ngIf="step3.get('instructions')?.touched && step3.get('instructions')?.invalid" class="text-red-500 text-sm">
+                                    <small *ngIf="step3.get('instructions')?.errors?.['required']">Instructions are required.</small>
+                                    <small *ngIf="step3.get('instructions')?.errors?.['minlength']">Instructions must be at least 10 characters long.</small>
+                                    <small *ngIf="step3.get('instructions')?.errors?.['pattern']">Instructions contain invalid characters.</small>
+                                </small>
+                                <p-floatlabel class="w-full" variant="on">
+                                    <textarea rows="10" pTextarea formControlName="instructions" class="w-full" required></textarea>
+                                    <label for="instructions">Describe the steps to follow...*</label>
+                                </p-floatlabel>
+                            </div>
+                            <div class="flex pt-6 justify-between">
+                                <p-button (click)="activateCallback(2)" label="Back" severity="secondary" icon="pi pi-arrow-left" />
+                                <p-button label="Add my recipe" icon="pi pi-check" iconPos="right" (click)="onSubmit()" />
+                            </div>
+                        </ng-template>
+                    </p-step-panel>
+                    
+                </p-step-panels>
+            </p-stepper>
+
+</form>
+</div>
+</div>
+        

@@ -1,0 +1,17 @@
+<section class="mt-4 p-4 text-white h-screen overflow-auto">
+  <div *ngIf="recipes.length === 0" class="text-center text-gray-600 flex flex-col gap-4">
+    No recipes found.
+    <p-button label="Discover new recipes" routerLink="/recipes"></p-button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <ng-container *ngFor="let recipe of recipes">
+      <app-recipe-card
+        [recipe]="recipe"
+        [favoriteStatus]="favoriteStatus[recipe.id]"
+        (toggleFavoriteEvent)="toggleFavorite(recipe.id)"
+        (viewDetails)="getRecipeDetails($event.id)">
+      </app-recipe-card>
+    </ng-container>
+  </div>
+</section>

@@ -1,0 +1,53 @@
+<section
+  class="p-4 md:p-6 lg:p-8 bg-gradient-to-br from-white-50 via-amber-50 to-orange-100/80 flex flex-col gap-6"
+>
+  <!-- Header + Button (responsive) -->
+  <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+    <!-- Title & subtitle -->
+    <div class="flex flex-col">
+      <h1 class="font-bold text-3xl">Discover Our Recipes</h1>
+      <p class="text-orange-900/60">
+        Explore our collection of delicious recipes shared by our community of passionate cooks.
+      </p>
+    </div>
+
+    <!-- Add Recipe Button -->
+    <p-button
+      label="Add Recipe"
+      icon="pi pi-plus"
+      class="self-start lg:self-start"
+      routerLink="/create-recipe"
+    ></p-button>
+  </div>
+
+  <!-- Search bar -->
+  <div class="flex justify-center">
+  <p-iconfield class=" w-full lg:w-[600px] flex items-center">
+    <p-inputicon
+      class="pi pi-search text-orange-900/50 pointer-events-none"
+    ></p-inputicon>
+    
+    <input
+      type="text"
+      pInputText
+      placeholder="Search by name, ingredient, or cuisine type..."
+      class="
+        placeholder:text-orange-900/50
+        pl-10
+        rounded-md shadow-lg border-orange-100 border-[1px]
+        focus:border-orange-500 focus:ring-orange-500 focus:border-[1px]
+        focus:ring-1
+        w-full h-12 p-inputtext-sm bg-white px-2 py-4
+      "
+    />
+  </p-iconfield>
+</div>
+  <!-- Filters section 
+  <div class="flex items-center gap-4">
+    <p>FILTERS</p>
+  </div> -->
+</section>
+<section class="text-white h-screen overflow-auto bg-white">
+    <app-recipe-list></app-recipe-list>
+</section>
+
